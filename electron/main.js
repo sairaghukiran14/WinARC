@@ -15,6 +15,7 @@ function createWindow() {
     minHeight: 650,
     titleBarStyle: 'hiddenInset', // Sleek Mac titlebar
     backgroundColor: '#080808',
+    icon: path.join(__dirname, '../public/icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,

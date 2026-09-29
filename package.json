@@ -16,14 +16,17 @@
   "build": {
     "appId": "com.winterarc.desktop",
     "productName": "Winter ARC",
+    "icon": "build/icon.png",
     "directories": {
       "output": "dist_electron"
     },
     "files": [
       "dist/**/*",
-      "electron/**/*"
+      "electron/**/*",
+      "public/**/*"
     ],
     "mac": {
+      "icon": "build/icon.icns",
       "category": "public.app-category.productivity",
       "target": ["dmg"],
       "hardenedRuntime": false,
