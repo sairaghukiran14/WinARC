@@ -5,6 +5,22 @@
 
 ---
 
+## 📥 Download & Quick Start
+
+### 1. Download Desktop App Installer (.dmg)
+- **Direct Installer Download**: [Download Winter ARC macOS Installer (.dmg)](https://github.com/sairaghukiran14/WinARC/releases/latest)
+- **Built Installer Path**: [`dist_electron/Winter ARC-0.0.0-arm64.dmg`](file:///Users/sairaghukiranavula/Projects/Winter%20ARC/dist_electron/Winter%20ARC-0.0.0-arm64.dmg)
+
+### 2. Installation & How to Use (macOS)
+1. **Mount Disk Image**: Double-click the downloaded **`Winter ARC-0.0.0-arm64.dmg`** file.
+2. **Install**: Drag and drop the **Winter ARC** icon into your **Applications** folder.
+3. **Launch**: Press `Cmd + Space` to open **Spotlight**, search for **Winter ARC**, and launch the app.
+4. **Use Offline**: All protocol logs, macros, weight trends, and media logs will save automatically on your device via `localStorage` and `IndexedDB`.
+
+> 💡 **macOS Security Note**: If prompted with a first-time security popup, go to **System Settings > Privacy & Security** and select **Open Anyway**.
+
+---
+
 ## 🌟 Key Features
 
 ### 1. ⚡ Today's Protocol Dashboard
