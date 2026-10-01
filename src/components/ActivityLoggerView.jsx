@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, Plus, Trash2, Calendar, Tag, CheckCircle, Zap, Activity } from 'lucide-react';
+import { Clock, Plus, Trash2, Calendar, Tag, CheckCircle, Zap, Activity, Droplets, RefreshCw } from 'lucide-react';
 import { getTodayKey } from '../utils/storage';
 
 export default function ActivityLoggerView({ activityLogs = {}, onUpdateActivityLogs }) {
@@ -7,8 +7,24 @@ export default function ActivityLoggerView({ activityLogs = {}, onUpdateActivity
   const [actionText, setActionText] = useState('');
   const [category, setCategory] = useState('Workout');
   const [actionTime, setActionTime] = useState(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  const [customWaterMl, setCustomWaterMl] = useState('');
 
-  const dateLogs = activityLogs[selectedDate] || [];
+  const dateData = activityLogs[selectedDate] || {};
+  // Handle array format vs object format for date logs
+  const dateLogs = Array.isArray(dateData) ? dateData : (dateData.logs || []);
+  const waterIntakeMl = Array.isArray(dateData) ? (dateData.waterIntakeMl || 0) : (dateData.waterIntakeMl || 0);
+  const waterTargetMl = 3500; // 3.5 Liters default target
+
+  const updateDateActivityData = (newLogs, newWaterMl = waterIntakeMl) => {
+    const updatedAll = {
+      ...activityLogs,
+      [selectedDate]: {
+        logs: newLogs,
+        waterIntakeMl: newWaterMl
+      }
+    };
+    onUpdateActivityLogs(updatedAll);
+  };
 
   const handleAddAction = (e) => {
     e.preventDefault();
@@ -23,14 +39,32 @@ export default function ActivityLoggerView({ activityLogs = {}, onUpdateActivity
     };
 
     const updatedDateLogs = [newAction, ...dateLogs];
-    const updatedAll = {
-      ...activityLogs,
-      [selectedDate]: updatedDateLogs
-    };
-
-    onUpdateActivityLogs(updatedAll);
+    updateDateActivityData(updatedDateLogs, waterIntakeMl);
     setActionText('');
     setActionTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  };
+
+  const handleAddWater = (amountMl) => {
+    const added = Number(amountMl) || 0;
+    if (added <= 0) return;
+
+    const newTotal = waterIntakeMl + added;
+    const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const newAction = {
+      id: 'act_water_' + Date.now(),
+      time: timeNow,
+      text: `💧 Drank ${added} ml water (Total today: ${(newTotal / 1000).toFixed(2)} L)`,
+      category: 'Nutrition',
+      createdAt: new Date().toISOString()
+    };
+
+    const updatedDateLogs = [newAction, ...dateLogs];
+    updateDateActivityData(updatedDateLogs, newTotal);
+  };
+
+  const handleResetWater = () => {
+    updateDateActivityData(dateLogs, 0);
   };
 
   const handleQuickPreset = (presetText, presetCategory) => {
@@ -43,21 +77,12 @@ export default function ActivityLoggerView({ activityLogs = {}, onUpdateActivity
     };
 
     const updatedDateLogs = [newAction, ...dateLogs];
-    const updatedAll = {
-      ...activityLogs,
-      [selectedDate]: updatedDateLogs
-    };
-
-    onUpdateActivityLogs(updatedAll);
+    updateDateActivityData(updatedDateLogs, waterIntakeMl);
   };
 
   const handleDeleteAction = (id) => {
     const updatedDateLogs = dateLogs.filter(a => a.id !== id);
-    const updatedAll = {
-      ...activityLogs,
-      [selectedDate]: updatedDateLogs
-    };
-    onUpdateActivityLogs(updatedAll);
+    updateDateActivityData(updatedDateLogs, waterIntakeMl);
   };
 
   const PRESETS = [
@@ -70,18 +95,20 @@ export default function ActivityLoggerView({ activityLogs = {}, onUpdateActivity
     { text: '10 min daily journal & reflection written', category: 'Mindset' }
   ];
 
+  const waterPct = Math.min(100, Math.round((waterIntakeMl / waterTargetMl) * 100));
+
   return (
     <div className="animate-fade-in" style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto' }}>
       
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Activity size={24} style={{ color: 'var(--accent-ice)' }} />
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Everyday Action & Activity Logger</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Everyday Action & Water Logger</h2>
           </div>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-            Record every action, workout, deep work block, and meal throughout your day in real-time.
+            Record every action, workout, deep work block, and track your total daily water intake.
           </p>
         </div>
 
@@ -93,6 +120,103 @@ export default function ActivityLoggerView({ activityLogs = {}, onUpdateActivity
             onChange={(e) => setSelectedDate(e.target.value)}
             style={{ padding: '8px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: 'var(--bg-input)', fontWeight: 700 }}
           />
+        </div>
+      </div>
+
+      {/* Prominent Daily Water Intake Tracker Card */}
+      <div className="card" style={{ marginBottom: '28px', padding: '24px', borderLeft: '4px solid var(--accent-ice)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ padding: '10px', borderRadius: 'var(--radius-md)', background: 'var(--accent-ice-light)', color: 'var(--accent-ice)' }}>
+              <Droplets size={24} />
+            </div>
+            <div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
+                Daily Hydration Consumption
+              </span>
+              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, marginTop: '2px' }}>
+                {waterIntakeMl.toLocaleString()} mL <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600 }}>/ {waterTargetMl.toLocaleString()} mL ({(waterIntakeMl / 1000).toFixed(2)} L / {(waterTargetMl / 1000).toFixed(1)} L)</span>
+              </h3>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <span className="badge badge-ice" style={{ fontSize: '0.9rem', padding: '6px 14px' }}>
+              {waterPct}% Target Met
+            </span>
+            {waterIntakeMl > 0 && (
+              <button
+                className="btn btn-ghost"
+                style={{ padding: '6px 10px', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}
+                onClick={handleResetWater}
+                title="Reset Water Counter"
+              >
+                <RefreshCw size={14} /> Reset
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Water Progress Track */}
+        <div className="progress-track" style={{ height: '10px', marginBottom: '20px' }}>
+          <div
+            className="progress-fill"
+            style={{
+              width: `${waterPct}%`,
+              background: waterPct >= 100 ? 'var(--accent-emerald)' : 'var(--accent-ice)'
+            }}
+          />
+        </div>
+
+        {/* Quick Add Buttons */}
+        <div>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+            ⚡ One-Tap Water Intake Logger:
+          </span>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <button className="btn btn-secondary" onClick={() => handleAddWater(250)} style={{ fontSize: '0.8rem' }}>
+              🥤 +250 mL (Glass)
+            </button>
+            <button className="btn btn-secondary" onClick={() => handleAddWater(500)} style={{ fontSize: '0.8rem' }}>
+              🍾 +500 mL (Bottle)
+            </button>
+            <button className="btn btn-secondary" onClick={() => handleAddWater(750)} style={{ fontSize: '0.8rem' }}>
+              ⚡ +750 mL (Shaker)
+            </button>
+            <button className="btn btn-ice" onClick={() => handleAddWater(1000)} style={{ fontSize: '0.8rem' }}>
+              💧 +1,000 mL (1 Liter)
+            </button>
+
+            {/* Custom Input */}
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginLeft: 'auto' }}>
+              <input
+                type="number"
+                placeholder="Custom mL (e.g. 350)"
+                value={customWaterMl}
+                onChange={(e) => setCustomWaterMl(e.target.value)}
+                style={{
+                  width: '150px',
+                  padding: '8px 12px',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-input)',
+                  fontSize: '0.8rem'
+                }}
+              />
+              <button
+                className="btn btn-primary"
+                style={{ padding: '8px 12px', fontSize: '0.8rem' }}
+                onClick={() => {
+                  if (customWaterMl) {
+                    handleAddWater(Number(customWaterMl));
+                    setCustomWaterMl('');
+                  }
+                }}
+              >
+                + Add
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -243,3 +367,4 @@ export default function ActivityLoggerView({ activityLogs = {}, onUpdateActivity
     </div>
   );
 }
+

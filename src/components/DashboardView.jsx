@@ -211,8 +211,8 @@ export default function DashboardView({ habits, rules, logs, onUpdateLogs, onAdd
                       justifyContent: 'space-between',
                       padding: '14px 18px',
                       borderRadius: 'var(--radius-md)',
-                      background: isChecked ? 'var(--accent-ice-light)' : 'var(--bg-app)',
-                      border: isChecked ? '1px solid var(--accent-ice-border)' : '1px solid var(--border-subtle)',
+                      background: isChecked ? 'rgba(16, 185, 129, 0.12)' : 'var(--bg-app)',
+                      border: isChecked ? '1px solid #10b981' : '1px solid var(--border-subtle)',
                       cursor: 'pointer',
                       transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
                     }}
@@ -224,26 +224,27 @@ export default function DashboardView({ habits, rules, logs, onUpdateLogs, onAdd
                           height: '24px',
                           borderRadius: '6px',
                           border: isChecked ? 'none' : '2px solid var(--border-strong)',
-                          background: isChecked ? 'var(--accent-ice)' : '#ffffff',
+                          background: isChecked ? '#10b981' : '#ffffff',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           color: '#ffffff',
+                          boxShadow: isChecked ? '0 0 10px rgba(16, 185, 129, 0.4)' : 'none',
                           transition: 'all 0.15s ease'
                         }}
                       >
-                        {isChecked && <Check size={16} strokeWidth={3} />}
+                        {isChecked && <Check size={16} strokeWidth={3} style={{ color: '#ffffff' }} />}
                       </div>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ color: isChecked ? 'var(--accent-ice)' : 'var(--text-secondary)' }}>
+                        <div style={{ color: isChecked ? '#10b981' : 'var(--text-secondary)' }}>
                           <IconComponent size={18} />
                         </div>
                         <div>
-                          <div style={{ fontWeight: 700, fontSize: '0.95rem', textDecoration: isChecked ? 'line-through' : 'none', color: isChecked ? 'var(--accent-ice)' : 'var(--text-primary)' }}>
+                          <div style={{ fontWeight: 700, fontSize: '0.95rem', textDecoration: isChecked ? 'line-through' : 'none', color: isChecked ? '#10b981' : 'var(--text-primary)' }}>
                             {habit.title}
                           </div>
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>
+                          <span style={{ fontSize: '0.75rem', color: isChecked ? 'var(--accent-emerald)' : 'var(--text-tertiary)', fontWeight: 600 }}>
                             {habit.category}
                           </span>
                         </div>
@@ -368,7 +369,7 @@ export default function DashboardView({ habits, rules, logs, onUpdateLogs, onAdd
                       type="checkbox"
                       checked={!!isDone}
                       onChange={() => toggleRule(rule.id)}
-                      style={{ accentColor: 'var(--accent-fire)', cursor: 'pointer' }}
+                      style={{ accentColor: '#10b981', cursor: 'pointer', width: '18px', height: '18px' }}
                     />
                     <span>{rule.text}</span>
                   </label>

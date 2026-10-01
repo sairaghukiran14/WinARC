@@ -66,6 +66,23 @@ export function calculateArcInfo() {
   }
 }
 
+export const INITIAL_MACRO_TARGETS = { calories: 2400, protein: 180, carbs: 220, fats: 65, fiber: 30 };
+
+export const INITIAL_JOURNAL_LOGS = {
+  [getTodayKey()]: [
+    {
+      id: 'journal_init_1',
+      date: getTodayKey(),
+      title: 'Day 1: Winter ARC Lock-In',
+      content: 'Starting the Winter ARC protocol today with 100% focus. Cut out distractions, hit the gym early, and stayed hydrated. Standard is set.',
+      mood: '⚡ High',
+      win: 'Woke up on first alarm at 5:00 AM',
+      tags: ['Mindset', 'Discipline'],
+      createdAt: new Date().toISOString()
+    }
+  ]
+};
+
 export function loadAppData() {
   try {
     const profile = JSON.parse(localStorage.getItem('winter_arc_profile')) || INITIAL_PROFILE;
@@ -76,11 +93,25 @@ export function loadAppData() {
     const milestones = JSON.parse(localStorage.getItem('winter_arc_milestones')) || {};
     const activityLogs = JSON.parse(localStorage.getItem('winter_arc_activity_logs')) || {};
     const macroLogs = JSON.parse(localStorage.getItem('winter_arc_macro_logs')) || {};
-    const macroTargets = JSON.parse(localStorage.getItem('winter_arc_macro_targets')) || { calories: 2400, protein: 180, carbs: 220, fats: 65 };
-    return { profile, habits, rules, goals, logs, milestones, activityLogs, macroLogs, macroTargets };
+    const rawMacroTargets = JSON.parse(localStorage.getItem('winter_arc_macro_targets')) || {};
+    const macroTargets = { calories: 2400, protein: 180, carbs: 220, fats: 65, fiber: 30, ...rawMacroTargets };
+    const journalLogs = JSON.parse(localStorage.getItem('winter_arc_journal_logs')) || INITIAL_JOURNAL_LOGS;
+    
+    return { profile, habits, rules, goals, logs, milestones, activityLogs, macroLogs, macroTargets, journalLogs };
   } catch (err) {
     console.error('Error loading Winter Arc data', err);
-    return { profile: INITIAL_PROFILE, habits: INITIAL_HABITS, rules: INITIAL_RULES, goals: INITIAL_GOALS, logs: {}, milestones: {}, activityLogs: {}, macroLogs: {}, macroTargets: { calories: 2400, protein: 180, carbs: 220, fats: 65 } };
+    return { 
+      profile: INITIAL_PROFILE, 
+      habits: INITIAL_HABITS, 
+      rules: INITIAL_RULES, 
+      goals: INITIAL_GOALS, 
+      logs: {}, 
+      milestones: {}, 
+      activityLogs: {}, 
+      macroLogs: {}, 
+      macroTargets: INITIAL_MACRO_TARGETS,
+      journalLogs: INITIAL_JOURNAL_LOGS
+    };
   }
 }
 
@@ -95,6 +126,7 @@ export function saveAppData(data) {
     if (data.activityLogs) localStorage.setItem('winter_arc_activity_logs', JSON.stringify(data.activityLogs));
     if (data.macroLogs) localStorage.setItem('winter_arc_macro_logs', JSON.stringify(data.macroLogs));
     if (data.macroTargets) localStorage.setItem('winter_arc_macro_targets', JSON.stringify(data.macroTargets));
+    if (data.journalLogs) localStorage.setItem('winter_arc_journal_logs', JSON.stringify(data.journalLogs));
   } catch (err) {
     console.error('Error saving Winter Arc data', err);
   }

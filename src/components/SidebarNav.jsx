@@ -1,12 +1,13 @@
 import React from 'react';
 import { 
   LayoutDashboard, CalendarDays, User, Camera, Target, BarChart2, 
-  Settings, Flame, Trophy, Activity, Snowflake, Plus, Shield, Utensils
+  Settings, Flame, Trophy, Activity, Snowflake, Plus, Shield, Utensils, BookOpen
 } from 'lucide-react';
 
 export default function SidebarNav({ activeTab, setActiveTab, profile, stats, onOpenMediaModal }) {
   const menuItems = [
     { id: 'dashboard', label: 'Today\'s Protocol', icon: LayoutDashboard },
+    { id: 'journal', label: 'Mindset Journal', icon: BookOpen },
     { id: 'activity', label: 'Activity Logger', icon: Activity },
     { id: 'macros', label: 'Daily Macros', icon: Utensils },
     { id: 'milestones', label: '30 Milestones', icon: Trophy },

@@ -239,6 +239,15 @@ input::placeholder, textarea::placeholder {
   color: var(--text-tertiary) !important;
 }
 
+/* Green Checkboxes when checked */
+input[type="checkbox"] {
+  accent-color: #10b981 !important;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+
 /* Page & Modal Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }

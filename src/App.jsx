@@ -3,6 +3,7 @@ import TitleBar from './components/TitleBar';
 import SidebarNav from './components/SidebarNav';
 import WorkspaceHeader from './components/WorkspaceHeader';
 import DashboardView from './components/DashboardView';
+import JournalView from './components/JournalView';
 import ActivityLoggerView from './components/ActivityLoggerView';
 import DailyMacrosView from './components/DailyMacrosView';
 import Milestones30View from './components/Milestones30View';
@@ -13,7 +14,7 @@ import GoalsView from './components/GoalsView';
 import AnalyticsView from './components/AnalyticsView';
 import SettingsView from './components/SettingsView';
 import MediaCaptureModal from './components/MediaCaptureModal';
-import { loadAppData, saveAppData, calculateArcInfo, getTodayKey, INITIAL_HABITS, INITIAL_RULES, INITIAL_GOALS, INITIAL_PROFILE } from './utils/storage';
+import { loadAppData, saveAppData, calculateArcInfo, getTodayKey, INITIAL_HABITS, INITIAL_RULES, INITIAL_GOALS, INITIAL_PROFILE, INITIAL_MACRO_TARGETS } from './utils/storage';
 import { getSavedTheme, applyTheme } from './utils/themes';
 
 export default function App() {
@@ -27,7 +28,8 @@ export default function App() {
   const [milestones, setMilestones] = useState({});
   const [activityLogs, setActivityLogs] = useState({});
   const [macroLogs, setMacroLogs] = useState({});
-  const [macroTargets, setMacroTargets] = useState({ calories: 2400, protein: 180, carbs: 220, fats: 65 });
+  const [macroTargets, setMacroTargets] = useState(INITIAL_MACRO_TARGETS);
+  const [journalLogs, setJournalLogs] = useState({});
   const [showGlobalMediaModal, setShowGlobalMediaModal] = useState(false);
 
   // Apply theme on load and change
@@ -46,7 +48,8 @@ export default function App() {
     setMilestones(data.milestones || {});
     setActivityLogs(data.activityLogs || {});
     setMacroLogs(data.macroLogs || {});
-    setMacroTargets(data.macroTargets || { calories: 2400, protein: 180, carbs: 220, fats: 65 });
+    setMacroTargets(data.macroTargets || INITIAL_MACRO_TARGETS);
+    setJournalLogs(data.journalLogs || {});
   }, []);
 
   const handleSelectTheme = (themeId) => {
@@ -56,47 +59,52 @@ export default function App() {
 
   const handleUpdateProfile = (newProfile) => {
     setProfile(newProfile);
-    saveAppData({ profile: newProfile, habits, rules, goals, logs, milestones, activityLogs, macroLogs, macroTargets });
+    saveAppData({ profile: newProfile, habits, rules, goals, logs, milestones, activityLogs, macroLogs, macroTargets, journalLogs });
   };
 
   const handleUpdateHabits = (newHabits) => {
     setHabits(newHabits);
-    saveAppData({ profile, habits: newHabits, rules, goals, logs, milestones, activityLogs, macroLogs, macroTargets });
+    saveAppData({ profile, habits: newHabits, rules, goals, logs, milestones, activityLogs, macroLogs, macroTargets, journalLogs });
   };
 
   const handleUpdateRules = (newRules) => {
     setRules(newRules);
-    saveAppData({ profile, habits, rules: newRules, goals, logs, milestones, activityLogs, macroLogs, macroTargets });
+    saveAppData({ profile, habits, rules: newRules, goals, logs, milestones, activityLogs, macroLogs, macroTargets, journalLogs });
   };
 
   const handleUpdateGoals = (newGoals) => {
     setGoals(newGoals);
-    saveAppData({ profile, habits, rules, goals: newGoals, logs, milestones, activityLogs, macroLogs, macroTargets });
+    saveAppData({ profile, habits, rules, goals: newGoals, logs, milestones, activityLogs, macroLogs, macroTargets, journalLogs });
   };
 
   const handleUpdateLogs = (newLogs) => {
     setLogs(newLogs);
-    saveAppData({ profile, habits, rules, goals, logs: newLogs, milestones, activityLogs, macroLogs, macroTargets });
+    saveAppData({ profile, habits, rules, goals, logs: newLogs, milestones, activityLogs, macroLogs, macroTargets, journalLogs });
   };
 
   const handleUpdateMilestones = (newMilestones) => {
     setMilestones(newMilestones);
-    saveAppData({ profile, habits, rules, goals, logs, milestones: newMilestones, activityLogs, macroLogs, macroTargets });
+    saveAppData({ profile, habits, rules, goals, logs, milestones: newMilestones, activityLogs, macroLogs, macroTargets, journalLogs });
   };
 
   const handleUpdateActivityLogs = (newActivityLogs) => {
     setActivityLogs(newActivityLogs);
-    saveAppData({ profile, habits, rules, goals, logs, milestones, activityLogs: newActivityLogs, macroLogs, macroTargets });
+    saveAppData({ profile, habits, rules, goals, logs, milestones, activityLogs: newActivityLogs, macroLogs, macroTargets, journalLogs });
   };
 
   const handleUpdateMacroLogs = (newMacroLogs) => {
     setMacroLogs(newMacroLogs);
-    saveAppData({ profile, habits, rules, goals, logs, milestones, activityLogs, macroLogs: newMacroLogs, macroTargets });
+    saveAppData({ profile, habits, rules, goals, logs, milestones, activityLogs, macroLogs: newMacroLogs, macroTargets, journalLogs });
   };
 
   const handleUpdateMacroTargets = (newMacroTargets) => {
     setMacroTargets(newMacroTargets);
-    saveAppData({ profile, habits, rules, goals, logs, milestones, activityLogs, macroLogs, macroTargets: newMacroTargets });
+    saveAppData({ profile, habits, rules, goals, logs, milestones, activityLogs, macroLogs, macroTargets: newMacroTargets, journalLogs });
+  };
+
+  const handleUpdateJournalLogs = (newJournalLogs) => {
+    setJournalLogs(newJournalLogs);
+    saveAppData({ profile, habits, rules, goals, logs, milestones, activityLogs, macroLogs, macroTargets, journalLogs: newJournalLogs });
   };
 
   const handleAddHabit = (newHabit) => {
@@ -113,8 +121,9 @@ export default function App() {
     setMilestones({});
     setActivityLogs({});
     setMacroLogs({});
-    setMacroTargets({ calories: 2400, protein: 180, carbs: 220, fats: 65 });
-    saveAppData({ profile: INITIAL_PROFILE, habits: INITIAL_HABITS, rules: INITIAL_RULES, goals: INITIAL_GOALS, logs: {}, milestones: {}, activityLogs: {}, macroLogs: {}, macroTargets: { calories: 2400, protein: 180, carbs: 220, fats: 65 } });
+    setMacroTargets(INITIAL_MACRO_TARGETS);
+    setJournalLogs({});
+    saveAppData({ profile: INITIAL_PROFILE, habits: INITIAL_HABITS, rules: INITIAL_RULES, goals: INITIAL_GOALS, logs: {}, milestones: {}, activityLogs: {}, macroLogs: {}, macroTargets: INITIAL_MACRO_TARGETS, journalLogs: {} });
   };
 
   // Compute stats for header
@@ -188,6 +197,13 @@ export default function App() {
                 logs={logs}
                 onUpdateLogs={handleUpdateLogs}
                 onAddHabit={handleAddHabit}
+              />
+            )}
+
+            {activeTab === 'journal' && (
+              <JournalView
+                journalLogs={journalLogs}
+                onUpdateJournalLogs={handleUpdateJournalLogs}
               />
             )}
 

@@ -29,15 +29,17 @@ export default function DailyMacrosView({ macroLogs = {}, macroTargets = {}, onU
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fats, setFats] = useState('');
+  const [fiber, setFiber] = useState('');
 
   const [dialogInfo, setDialogInfo] = useState({ isOpen: false, title: '', message: '', type: 'info' });
 
-  // Targets (defaults: 2400 kcal, 180g P, 220g C, 65g F)
+  // Targets (defaults: 2400 kcal, 180g P, 220g C, 65g F, 30g Fiber)
   const targets = {
     calories: macroTargets.calories || 2400,
     protein: macroTargets.protein || 180,
     carbs: macroTargets.carbs || 220,
     fats: macroTargets.fats || 65,
+    fiber: macroTargets.fiber || 30,
   };
 
   const dayMeals = macroLogs[selectedDate] || [];
@@ -47,19 +49,21 @@ export default function DailyMacrosView({ macroLogs = {}, macroTargets = {}, onU
   const totalProtein = dayMeals.reduce((acc, m) => acc + (Number(m.protein) || 0), 0);
   const totalCarbs = dayMeals.reduce((acc, m) => acc + (Number(m.carbs) || 0), 0);
   const totalFats = dayMeals.reduce((acc, m) => acc + (Number(m.fats) || 0), 0);
+  const totalFiber = dayMeals.reduce((acc, m) => acc + (Number(m.fiber) || 0), 0);
 
   const calPct = Math.min(100, Math.round((totalCalories / targets.calories) * 100));
   const proPct = Math.min(100, Math.round((totalProtein / targets.protein) * 100));
   const carbPct = Math.min(100, Math.round((totalCarbs / targets.carbs) * 100));
   const fatPct = Math.min(100, Math.round((totalFats / targets.fats) * 100));
+  const fibPct = Math.min(100, Math.round((totalFiber / targets.fiber) * 100));
 
-  // Doughnut Chart Data for Macro Ratios (Protein, Carbs, Fats)
+  // Doughnut Chart Data for Macro Ratios (Protein, Carbs, Fats, Fiber)
   const macroDoughnutData = {
-    labels: ['Protein (g)', 'Carbs (g)', 'Fats (g)'],
+    labels: ['Protein (g)', 'Carbs (g)', 'Fats (g)', 'Fiber (g)'],
     datasets: [
       {
-        data: [totalProtein, totalCarbs, totalFats],
-        backgroundColor: ['#10b981', '#38bdf8', '#a855f7'],
+        data: [totalProtein, totalCarbs, totalFats, totalFiber],
+        backgroundColor: ['#10b981', '#38bdf8', '#a855f7', '#84cc16'],
         borderColor: '#121212',
         borderWidth: 3,
         hoverOffset: 6
@@ -76,7 +80,7 @@ export default function DailyMacrosView({ macroLogs = {}, macroTargets = {}, onU
         position: 'bottom',
         labels: {
           color: '#94a3b8',
-          font: { size: 12, weight: 'bold' }
+          font: { size: 11, weight: 'bold' }
         }
       },
       tooltip: {
@@ -135,6 +139,7 @@ export default function DailyMacrosView({ macroLogs = {}, macroTargets = {}, onU
       protein: Number(protein) || 0,
       carbs: Number(carbs) || 0,
       fats: Number(fats) || 0,
+      fiber: Number(fiber) || 0,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -150,6 +155,7 @@ export default function DailyMacrosView({ macroLogs = {}, macroTargets = {}, onU
     setProtein('');
     setCarbs('');
     setFats('');
+    setFiber('');
   };
 
   const handleDeleteMeal = (id) => {
@@ -182,7 +188,7 @@ export default function DailyMacrosView({ macroLogs = {}, macroTargets = {}, onU
             <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Daily Nutrition & Macros Tracker</h2>
           </div>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-            Track daily calories, protein, carbs, and fats for optimal Winter ARC physical transformation.
+            Track daily calories, protein, carbs, fats, and dietary fiber for optimal physical transformation.
           </p>
         </div>
 
@@ -197,62 +203,76 @@ export default function DailyMacrosView({ macroLogs = {}, macroTargets = {}, onU
         </div>
       </div>
 
-      {/* 4 Macro Progress Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '28px' }}>
+      {/* 5 Macro Progress Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '28px' }}>
         
         {/* Calories */}
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Calories</span>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-fire)' }}>{calPct}%</span>
+        <div className="card" style={{ padding: '18px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Calories</span>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--accent-fire)' }}>{calPct}%</span>
           </div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-            {totalCalories} / {targets.calories} <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>kcal</span>
+          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+            {totalCalories} / {targets.calories} <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>kcal</span>
           </div>
-          <div className="progress-track" style={{ marginTop: '10px' }}>
+          <div className="progress-track" style={{ marginTop: '8px' }}>
             <div className="progress-fill" style={{ width: `${calPct}%`, background: 'var(--accent-fire)' }} />
           </div>
         </div>
 
         {/* Protein */}
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Protein</span>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-emerald)' }}>{proPct}%</span>
+        <div className="card" style={{ padding: '18px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Protein</span>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--accent-emerald)' }}>{proPct}%</span>
           </div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-            {totalProtein} / {targets.protein} <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>g</span>
+          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+            {totalProtein} / {targets.protein} <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>g</span>
           </div>
-          <div className="progress-track" style={{ marginTop: '10px' }}>
+          <div className="progress-track" style={{ marginTop: '8px' }}>
             <div className="progress-fill" style={{ width: `${proPct}%`, background: 'var(--accent-emerald)' }} />
           </div>
         </div>
 
         {/* Carbs */}
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Carbs</span>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-ice)' }}>{carbPct}%</span>
+        <div className="card" style={{ padding: '18px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Carbs</span>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--accent-ice)' }}>{carbPct}%</span>
           </div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-            {totalCarbs} / {targets.carbs} <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>g</span>
+          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+            {totalCarbs} / {targets.carbs} <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>g</span>
           </div>
-          <div className="progress-track" style={{ marginTop: '10px' }}>
+          <div className="progress-track" style={{ marginTop: '8px' }}>
             <div className="progress-fill" style={{ width: `${carbPct}%`, background: 'var(--accent-ice)' }} />
           </div>
         </div>
 
         {/* Fats */}
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Fats</span>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-purple)' }}>{fatPct}%</span>
+        <div className="card" style={{ padding: '18px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Fats</span>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--accent-purple)' }}>{fatPct}%</span>
           </div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-            {totalFats} / {targets.fats} <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>g</span>
+          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+            {totalFats} / {targets.fats} <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>g</span>
           </div>
-          <div className="progress-track" style={{ marginTop: '10px' }}>
+          <div className="progress-track" style={{ marginTop: '8px' }}>
             <div className="progress-fill" style={{ width: `${fatPct}%`, background: 'var(--accent-purple)' }} />
+          </div>
+        </div>
+
+        {/* Fiber */}
+        <div className="card" style={{ padding: '18px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Fiber</span>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#84cc16' }}>{fibPct}%</span>
+          </div>
+          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+            {totalFiber} / {targets.fiber} <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>g</span>
+          </div>
+          <div className="progress-track" style={{ marginTop: '8px' }}>
+            <div className="progress-fill" style={{ width: `${fibPct}%`, background: '#84cc16' }} />
           </div>
         </div>
 
@@ -323,7 +343,7 @@ export default function DailyMacrosView({ macroLogs = {}, macroTargets = {}, onU
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '20px' }}>
                 <div>
                   <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Carbs (g)</label>
                   <input
@@ -345,6 +365,17 @@ export default function DailyMacrosView({ macroLogs = {}, macroTargets = {}, onU
                     style={{ width: '100%', marginTop: '4px', padding: '10px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: 'var(--bg-input)' }}
                   />
                 </div>
+
+                <div>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Fiber (g)</label>
+                  <input
+                    type="number"
+                    placeholder="e.g. 8"
+                    value={fiber}
+                    onChange={(e) => setFiber(e.target.value)}
+                    style={{ width: '100%', marginTop: '4px', padding: '10px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: 'var(--bg-input)' }}
+                  />
+                </div>
               </div>
 
               <button type="submit" className="btn btn-ice" style={{ width: '100%' }}>
@@ -357,7 +388,7 @@ export default function DailyMacrosView({ macroLogs = {}, macroTargets = {}, onU
           <div className="card">
             <h3 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '14px' }}>Daily Target Goals</h3>
             <form onSubmit={handleSaveTargets}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
                 <div>
                   <label style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-tertiary)' }}>Calories (kcal)</label>
                   <input
@@ -377,7 +408,7 @@ export default function DailyMacrosView({ macroLogs = {}, macroTargets = {}, onU
                   />
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '14px' }}>
                 <div>
                   <label style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-tertiary)' }}>Carbs (g)</label>
                   <input
@@ -393,6 +424,15 @@ export default function DailyMacrosView({ macroLogs = {}, macroTargets = {}, onU
                     type="number"
                     value={targets.fats}
                     onChange={(e) => onUpdateMacroTargets({ ...targets, fats: Number(e.target.value) })}
+                    style={{ width: '100%', padding: '8px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', background: 'var(--bg-input)' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-tertiary)' }}>Fiber (g)</label>
+                  <input
+                    type="number"
+                    value={targets.fiber}
+                    onChange={(e) => onUpdateMacroTargets({ ...targets, fiber: Number(e.target.value) })}
                     style={{ width: '100%', padding: '8px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', background: 'var(--bg-input)' }}
                   />
                 </div>
@@ -438,11 +478,12 @@ export default function DailyMacrosView({ macroLogs = {}, macroTargets = {}, onU
                       <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
                         {meal.name}
                       </div>
-                      <div style={{ display: 'flex', gap: '12px', fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                      <div style={{ display: 'flex', gap: '12px', fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px', flexWrap: 'wrap' }}>
                         <span>🔥 <strong style={{ color: 'var(--accent-fire)' }}>{meal.calories}</strong> kcal</span>
                         <span>🥩 <strong style={{ color: 'var(--accent-emerald)' }}>{meal.protein}g</strong> P</span>
                         <span>🍚 <strong style={{ color: 'var(--accent-ice)' }}>{meal.carbs}g</strong> C</span>
                         <span>🥑 <strong style={{ color: 'var(--accent-purple)' }}>{meal.fats}g</strong> F</span>
+                        <span>🌾 <strong style={{ color: '#84cc16' }}>{meal.fiber || 0}g</strong> Fib</span>
                       </div>
                     </div>
 
